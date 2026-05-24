@@ -1,0 +1,4 @@
+bio~=1.6.2
+matplotlib~=3.9.4
+weblogo~=3.8.0
+numpy~=2.0.2
