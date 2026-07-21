@@ -7,8 +7,12 @@ import re
 import clr # Библиотека для работы с .NET
 
 
-repeats_path = 'M_musculus'
-file_name = 'long_Mmusculus_epdnew_promoters.fasta'
+repeats_path = os.getenv('MY_GLOBAL_VAR')
+if repeats_path is None:
+    repeats_path = 'M_musculus'
+
+organizm = repeats_path.replace('_', '')
+file_name = f'TATAless_{organizm}_epdnew_promoters.fasta'
 ratios = []
 
 # Указываем путь к папке с нашей DLL (текущая директория)
@@ -39,11 +43,11 @@ def calculate_pwm_from_text(pfm_text, background=0.25, pseudocount=0.1):
 
 # Данные из https://jaspar.elixir.no/matrix/MA0079.3/?revcomp=1
 pfm_data = """
->MA0079.3	SP1
-A [	2379	1323	2055	0	0	2751	73	0	1932	1877	1820	]
-C [	734	0	0	0	0	4624	0	0	0	642	4271	]
-G [	4969	6357	6679	8734	8734	0	8661	8734	6703	6215	1786	]
-T [	652	1054	0	0	0	1359	0	0	99	0	857	]
+>MA0079.2	SP1
+A  [     0      0      0      4      2      0      1      0      6      3 ]
+C  [    32     30     35     27      5     28     31     24     25     26 ]
+G  [     1      1      0      0     15      1      0      3      0      3 ]
+T  [     2      4      0      4     13      6      3      8      4      3 ]
 """
 
 pwm_result = calculate_pwm_from_text(pfm_data)
@@ -111,18 +115,28 @@ def process_fasta_with_pwm(pwm, threshold=0.0):
 
 
 def plot_nucleotides(data, output_filename, prefix):
-    # Создание массива осей X с новыми индексами
-    x_positions = list(range(-500, 40))  # [-50, -49, ..., 0 (TSS), ..., +35]
+    # 1. Определяем длину данных
+    data_len = len(data)
+    if data_len == 0:
+        print("No data to plot.")
+        return
+
+    # 2. Создаем массив X, соответствующий длине данных.
+    #    Позиция 0 в массиве data соответствует -28 п.н. от TSS.
+    #    Позиция data_len-1 соответствует +35 п.н. от TSS.
+    #    Массив X будет от -28 до -28 + data_len - 1
+    x_positions = list(range(-50, -50 + data_len))
 
     # Построение графика
-    plt.figure(figsize=(15, 3))
-    plt.plot(x_positions, data[:len(x_positions)], marker='.', markersize=0, color='#00008f')
+    plt.figure(figsize=(15, 4.5))
+    plt.plot(x_positions, data, marker='.', markersize=0, color='#00008f')
 
-    # Установка собственных меток для оси X
-    step = 100  # Метки ставятся через каждые 10 единиц
-    custom_ticks = x_positions[::step]  # Берём каждую десятую позицию
+    # 3. Настройка меток на оси X
+    # Шаг меток: ставим их через каждые 5-10 позиций, чтобы они не сливались.
+    step = 5
+    custom_ticks = x_positions[::step]
     custom_labels = [str(i) if i != 0 else 'TSS' for i in custom_ticks]
-    plt.xticks(custom_ticks, custom_labels)  # Применяем новые метки и позиции
+    plt.xticks(custom_ticks, custom_labels)
 
     # Подписываем оси
     plt.axvline(x=0, color="red", linestyle="--", linewidth=0.5)  # Линия вертикальной разметки

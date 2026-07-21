@@ -1,14 +1,19 @@
 from Bio import SeqIO
 import matplotlib.pyplot as plt
+import weblogo
 from weblogo import *
 
-repeats_path = 'A_thaliana'
+# Получаем значение из окружения
+repeats_path = os.getenv('MY_GLOBAL_VAR')
+if repeats_path is None:
+    repeats_path = 'Z_mays'
+
 organizm = repeats_path.replace('_', '')
 
 file_name_list = [
     f'all_{organizm}_epdnew_promoters.fasta',
-    f'NoProhibNuc_{organizm}_epdnew_promoters.fasta',
-    f'ProhibNuc_{organizm}_epdnew_promoters.fasta',
+    f'TATA_{organizm}_epdnew_promoters.fasta',
+    f'TATAless_{organizm}_epdnew_promoters.fasta',
     # f'TATA2_{organizm}_epdnew_promoters.fasta',
     # f'TATA2less_{organizm}_epdnew_promoters.fasta',
 ]
@@ -131,7 +136,7 @@ def create_weblogo(file_name):
         SymbolColor("A", "black"),  # Adenine (Аденин) красным
         SymbolColor("T", "red")  # Thymine (Тимин) синим
     ])
-    options.yaxis_scale = 1.0
+    options.yaxis_scale = 0.4
     options.yaxis_tic_interval = 0.1
     options.fineprint_font_size = 30
     options.logo_height = 5
@@ -140,6 +145,22 @@ def create_weblogo(file_name):
     options.stack_spacing = 0  # Минимизирует расстояние между стопками
     options.show_fineprint = True  # Отключает подпись снизу
     options.logo_margin = 30
+    # Сгенерируем список подписей для каждого столбца
+    annotations = []
+    current_pos = -50
+    step = 5  # Задайте здесь нужный вам шаг (5, 10, 20 и т.д.)
+    for i in range(logo.length):
+        if current_pos == 0:
+            annotations.append("TSS")
+        elif current_pos % step == 0:
+            annotations.append(str(current_pos))
+        else:
+            annotations.append("")  # Передаем пустую строку, чтобы WebLogo ничего не рисовал
+        current_pos += 1
+    # Передаем наш список в настройки
+    options.annotate = annotations
+    options.show_index = False
+    options.number_interval = 5
     format = LogoFormat(logo, options)
 
     # 3. Save graph image
@@ -159,12 +180,12 @@ def create_directory_if_not_exists(dir_path):
 
 if __name__ == "__main__":
     for file_name in file_name_list:
-        create_directory_if_not_exists(Prob_plot_directory_path)
-        # Processing sequences
-        read_and_process_repeats(file_name)
-        # Normalize collected sums to probabilities
-        normalized_probs = normalize_counts(COUNT_BEG_VALUES)
-        # Immediately build and save the plot
-        plot_nucleotides(normalized_probs, file_name)
+        # create_directory_if_not_exists(Prob_plot_directory_path)
+        # # Processing sequences
+        # read_and_process_repeats(file_name)
+        # # Normalize collected sums to probabilities
+        # normalized_probs = normalize_counts(COUNT_BEG_VALUES)
+        # # Immediately build and save the plot
+        # plot_nucleotides(normalized_probs, file_name)
         # Create WebLogo
         create_weblogo(file_name)

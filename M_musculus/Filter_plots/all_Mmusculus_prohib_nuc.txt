@@ -1,5 +1,0 @@
-# Total sequences: 25111
-# Promoters without custom criteria: 4543
-
-# Share without custom criteria: 0.1809
-

@@ -1,7 +1,0 @@
-# Total sequences: 18416
-# Promoters without pattern: 18416
-
-# Share without pattern: 1.0
-
-Position	Frequency	Relative share (%)
-0	0	0.00%

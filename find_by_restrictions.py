@@ -1,7 +1,10 @@
 import os
 from Bio import SeqIO
 
-repeats_path = 'H_vulgare'
+repeats_path = os.getenv('MY_GLOBAL_VAR')
+if repeats_path is None:
+    repeats_path = 'A_thaliana'
+
 organizm = repeats_path.replace('_', '')
 file_name = f'all_{organizm}_epdnew_promoters.fasta'
 filter_plot_directory = 'Filter_plots'
@@ -72,11 +75,11 @@ def process_fasta_file():
 
     # Сохраняем результаты в новые FASTA-файлы
     file_name_list = file_name.split('_')
-    file_name_list[0] = 'ProhibNuc'
+    file_name_list[0] = 'TATAless'
     new_file_name = '_'.join(file_name_list)
     output_fasta_match = os.path.join(repeats_path, new_file_name)
 
-    file_name_list[0] = 'NoProhibNuc'
+    file_name_list[0] = 'TATA'
     new_file_name = '_'.join(file_name_list)
     output_fasta_nomatch = os.path.join(repeats_path, new_file_name)
 
@@ -110,7 +113,7 @@ if __name__ == "__main__":
     full_filepath = os.path.join(repeats_path, file_name)
 
     fn_list = file_name.split('_')
-    output_file = f"{fn_list[0]}_{fn_list[1]}_prohib_nuc.txt"
+    output_file = f"{fn_list[0]}_{fn_list[1]}_TATAless_nuc.txt"
     output_file = os.path.join(Filter_plot_directory_path, output_file)
 
     total_sequences, no_pattern_count = process_fasta_file()

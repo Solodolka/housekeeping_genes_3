@@ -2,13 +2,16 @@ import os
 from Bio import SeqIO
 import matplotlib.pyplot as plt
 
-repeats_path = 'A_thaliana'
+repeats_path = os.getenv('MY_GLOBAL_VAR')
+if repeats_path is None:
+    repeats_path = 'Z_mays'
+
 organizm = repeats_path.replace('_', '')
 
 file_name_list = [
     f'all_{organizm}_epdnew_promoters.fasta',
-    f'NoProhibNuc_{organizm}_epdnew_promoters.fasta',
-    f'ProhibNuc_{organizm}_epdnew_promoters.fasta',
+    f'TATA_{organizm}_epdnew_promoters.fasta',
+    f'TATAless_{organizm}_epdnew_promoters.fasta',
     # f'TATA_{organizm}_epdnew_promoters.fasta',
     # f'TATAless_{organizm}_epdnew_promoters.fasta',
 ]

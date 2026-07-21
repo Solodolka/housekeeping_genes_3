@@ -4,10 +4,17 @@ import matplotlib.pyplot as plt
 
 # Possible variants of the TATAWAWR sequence
 pattern = "TATAWAWR"
+# pattern = "SSRCGCC"
+# pattern = "RTDKKKK"
+pattern_name = "TATAWAWR"
 nuc_num = len(pattern)  # Length of the TATAWAWR sequence
 
-repeats_path = 'S_pombe'
-file_name = 'all_Spombe_epdnew_promoters.fasta'
+repeats_path = os.getenv('MY_GLOBAL_VAR')
+if repeats_path is None:
+    repeats_path = 'H_vulgare'
+
+organizm = repeats_path.replace('_', '')
+file_name = f'all_{organizm}_epdnew_promoters.fasta'
 
 filter_plot_directory = 'Filter_plots'
 Filter_plot_directory_path = repeats_path + "\\" + filter_plot_directory
@@ -20,9 +27,14 @@ def expand_pattern():
     # Словарь замен
     iupac = {
         'A': 'A',
+        'G': 'G',
+        'C': 'C',
         'T': 'T',
         'W': 'AT',
-        'R': 'AG'
+        'R': 'AG',
+        'S': 'GC',
+        'D': 'AGT',
+        'K': 'GT',
     }
     search_patterns = []
 
@@ -94,14 +106,14 @@ def process_fasta_file():
 
 
     file_name_list = file_name.split('_')
-    file_name_list[0] = 'TATA'
+    file_name_list[0] = pattern_name
     new_file_name = '_'.join(file_name_list)
     output_fasta = os.path.join(repeats_path, new_file_name)
     with open(output_fasta, "w") as out_handle:
         for record in TATA:
             SeqIO.write([record], out_handle, "fasta")
 
-    file_name_list[0] = 'TATAless'
+    file_name_list[0] = f'{pattern_name}_less'
     new_file_name = '_'.join(file_name_list)
     output_fasta = os.path.join(repeats_path, new_file_name)
     with open(output_fasta, "w") as out_handle:
@@ -188,13 +200,13 @@ if __name__ == "__main__":
     full_filepath = os.path.join(repeats_path, file_name)
 
     fn_list = file_name.split('_')
-    output_file = fn_list[0] + '_' + fn_list[1] + f"_TATA_box.txt"
+    output_file = fn_list[0] + '_' + fn_list[1] + f"_{pattern_name}_box.txt"
     output_file = os.path.join(Filter_plot_directory_path, output_file)
     # Main processing logic
     frequencies, total_sequences, no_pattern_count = process_fasta_file()
     save_results_to_file(output_file, frequencies, total_sequences, no_pattern_count)
 
-    output_file = fn_list[0] + '_' + fn_list[1] + f"_TATA_box.png"
+    output_file = fn_list[0] + '_' + fn_list[1] + f"_{pattern_name}_box.png"
     output_file = os.path.join(Filter_plot_directory_path, output_file)
-    prefix = '. Percent of TATAWAWR boxes'
+    prefix = f'. Percent of {pattern} boxes'
     plot_nucleotides(ratios, output_file, prefix)

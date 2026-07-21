@@ -1,8 +1,10 @@
 import os
 import matplotlib.pyplot as plt
 
-# Директория с файлами
-repeats_path = 'A_thaliana'
+repeats_path = os.getenv('MY_GLOBAL_VAR')
+if repeats_path is None:
+    repeats_path = 'Z_mays'
+
 NUCLEOTIDES_IN_STRING = 80  # Number of positions (nucleotides) to process
 
 cleavage_txt_directory = 'Cleavage_txt'
@@ -60,6 +62,8 @@ def plot_files(file_list, table_name, path):
 
     plt.xlabel('Relative Position to TSS')
     plt.ylabel('Value')
+    if table_name == 'Cleavage 6':
+        table_name = 'DNase I cleavage'
     plt.title(table_name + ' comparison')
     plt.grid(True)
     plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
@@ -73,8 +77,8 @@ def plot_files(file_list, table_name, path):
 
 filter_list = [
     'all',
-    'NoProhibNuc',
-    'ProhibNuc',
+    'TATA',
+    'TATAless',
     # 'TATA',
     # 'TATAless',
     # Добавьте другие файлы по необходимости
